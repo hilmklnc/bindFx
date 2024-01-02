@@ -8,7 +8,7 @@ from sklearn.linear_model import SGDRegressor
 import bio
 import pickle
 import glob
-
+# functions
 def peak_offset(sequence, peak, offset): # +30 / -30 peak offsets
     peak = peak - 1 # peak value exclusive
     left_offset = peak - offset
