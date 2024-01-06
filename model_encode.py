@@ -13,7 +13,7 @@ import scipy
 import multiprocessing
 from sklearn.model_selection import cross_val_score, KFold
 
-# Input : ChIPseq-derived trainset (as a PBM format)
+# Input : ChIPseq-derived trainsets (as a PBM format)
 def print_full(x): # print binary-based sequences
     y = pd.DataFrame(x)
     y.index = [bio.itoseq(x) for x in y.index]
@@ -29,7 +29,6 @@ def minmax(score):  # Min-max normalization
 def log2trans(score):  # binary logarithmic scaling
     log_scores = np.log2(score)
     return log_scores
-
 def log2trans_pbm(score):  # binary logarithmic scaling
     minscr = score[score.idxmin()]
     log_scores = np.log2(score - minscr + 1000) #
@@ -38,10 +37,10 @@ def apply_ols(df,TF_name,scaler=minmax):
     X = df.drop('score',axis=1).apply(scaler,axis=0)
     y = df["score"]
     # X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.2, random_state=25)
-    kf = KFold(n_splits=10, shuffle=True, random_state=25)
+    KF = KFold(n_splits=10, shuffle=True, random_state=25)
     ols_scores = []
     start_time = time.perf_counter()
-    for train_index, test_index in kf.split(X):
+    for train_index, test_index in KF.split(X):
         X_train, X_test = X.values[train_index], X.values[test_index]
         y_train, y_test = y.values[train_index], y.values[test_index]
         ols = sm.OLS(y_train, X_train).fit()
@@ -55,14 +54,14 @@ def apply_ols(df,TF_name,scaler=minmax):
     elapsed_time = end_time - start_time
     n_peaks = len(X)
     return [TF_name,n_peaks,r2, r2_std, elapsed_time]
-def apply_sgd_metrics(df, scaler,TF_name):
+def apply_sgd_metrics_CV(df, scaler,TF_name):
     X = df.drop('score', axis=1).apply(scaler, axis=0)
     y = df["score"]
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=4321)
-    kf = KFold(n_splits=10, shuffle=True, random_state=25)
-    sgd = SGDRegressor(alpha=0.0001, max_iter=1000, tol=1e-3, penalty=None, eta0=0.1,random_state=25)
+    KF = KFold(n_splits=10, shuffle=True, random_state=52)
+    sgd = SGDRegressor(alpha=0.0001, max_iter=1000, tol=1e-3, penalty=None, eta0=0.1, random_state=25)
     start_time = time.perf_counter()
-    sgd_scores = cross_val_score(sgd, X, y, cv=kf)
+    sgd_scores = cross_val_score(sgd, X, y, cv=KF)
     end_time = time.perf_counter()
     r2 = sgd_scores.mean()
     r2_std = sgd_scores.std()
@@ -89,18 +88,53 @@ def apply_sgd_metrics(df, scaler,TF_name):
     # [TF_name, n_peaks, mse, r, r2, rmse, mae, medae, elapsed_time, top_motifs, top_weights, bottom_motifs,
     #  bottom_weights]  # [1] = coefficients [-1] = covariance
     return [TF_name,n_peaks,r2,r2_std,elapsed_time]
+def apply_sgd_metrics(df, scaler,TF_name):
+    X = df.drop('score', axis=1).apply(scaler, axis=0)
+    y = df["score"]
+    sgd = SGDRegressor(alpha=0.0001, max_iter=1000, tol=1e-3, penalty=None, eta0=0.1, random_state=25)
+    start_time = time.perf_counter()
+    sgd.fit(X, y)
+    end_time = time.perf_counter()
+    print_motif = pd.DataFrame({"Weights": sgd.coef_}, index=nonrev_list)  # for array-like output of OLS result
+    print_motif = print_full(print_motif["Weights"].sort_values(ascending=False))
+    y_pred = sgd.predict(X)
+    elapsed_time = end_time - start_time
+    mse = mean_squared_error(y, y_pred)
+    r = scipy.stats.pearsonr(y, y_pred)[0]
+    r2 = r2_score(y, y_pred)
+    # Root Mean Squared Error (RMSE)
+    rmse = mean_squared_error(y, y_pred, squared=False)
+    # Mean Absolute Error (MAE)
+    mae = mean_absolute_error(y, y_pred)
+    # Median Absolute Error(MEDAE)
+    medae = median_absolute_error(y, y_pred)
+    n_peaks = len(X)
+    # TF_motifs = print_motif.to_csv(f"outputs/PBM_motifs/TF_motifs_SGD/sgd_motif_{TF_name}.csv")
+    top_motifs = list(print_motif.index.values[:6])
+    top_revmotifs = list(print_motif["revcomp"].values[:6])
+    top_weights = print_motif["Weights"].values[:6]
+    bottom_motifs = list(print_motif.index.values[-6:])
+    bottom_weights = list(print_motif["Weights"].values[-6:])
+    return  [TF_name, n_peaks, mse, r, r2, rmse, mae, medae, elapsed_time,
+             top_motifs, top_revmotifs,top_weights, bottom_motifs, bottom_weights]  # [1] = coefficients [-1] = covariance
 def perf_test(train_file,method="sgd"):
     # TF_name = train_file.split("\\")[1].upper().split("_")[-1].split(".")[0] qbic
     TF_name = train_file.split(".txt")[0].split("_")[-1] # cisbp
+    data_type = train_file.split(".txt")[0].split("_")[0]
     # TF_name = train_file.split("_")[0].upper() # uniprobe
     pbm_format = pd.read_csv(f"{file_path}/{train_file}", sep="\t", header=None)
     # pbm_format[1] = pbm_format[1].apply(variable_seq)
     if type(pbm_format[0][1]) != np.float64:
         pbm_format = pbm_format[[1, 0]]
     # print("\n",len(pbm_format[1][0]),"base pair (bp)")
-    df_chip = read_chip(pbm_format, log2trans)  # count table of trainset
+    if data_type == "PBM":
+        df_chip = read_chip(pbm_format, log2trans_pbm)  # count table of trainset
+    elif data_type == "ChIPseq":
+        df_chip = read_chip(pbm_format, log2trans)  # count table of trainset
+    else:
+        print("Unrecognized!-----------------!!!!!!!!!-------------------")
     if method == "sgd":
-        sgd_chip_none = apply_sgd_metrics(df_chip, minmax,TF_name)
+        sgd_chip_none = apply_sgd_metrics_CV(df_chip, minmax,TF_name)
         return sgd_chip_none
     else:
         ols = apply_ols(df_chip,TF_name)
@@ -154,7 +188,9 @@ def mypredict(seq1, seq2, k, params,cov_matrix):
 # os.makedirs("outputs/PBM_motifs/TF_motifs_OLS")
 # os.makedirs("outputs/PBM_motifs/TF_motifs_SGD")
 file_path= "outputs/encode_trainsets"
-trainsets = os.listdir(file_path)
+trainsets = os.listdir(file_path)[0:20]
+
+
 # trainsets = glob.glob("TFs_trainset/*.txt")
 # def run_all():
 #     global perf_df
@@ -174,7 +210,7 @@ trainsets = os.listdir(file_path)
 def process_file(train_file):
     current_process = multiprocessing.current_process().name
     try:
-        result = perf_test(train_file, "ols")
+        result = perf_test(train_file, "sgd")
         print(f"{current_process}: {train_file} is trained!\n")
         return result, train_file, None
     except Exception as e:
@@ -187,6 +223,8 @@ def run_all(n_process):
     # perf_df = pd.DataFrame(columns=["TF_Name", "n_peaks", "mse", "r", "r2", "rmse", "mae", "medae", "elapsed_time",
     #                                 "top_motifs", "top_weights", "bottom_motifs", "bottom_weights"])
     perf_df = pd.DataFrame(columns=["TF_Name", "n_peaks", "r2","r2_std","elapsed_time"])
+    # perf_df = pd.DataFrame(columns=["TF_Name","n_peaks","mse", "r", "r2", "rmse", "mae", "medae", "elapsed_time","top_motifs","top_revmotifs","top_weights","bottom_motifs","bottom_weights"])
+
     error_log = []
     for result, train_file, error in results:
         if error:
@@ -196,8 +234,11 @@ def run_all(n_process):
             #                  columns=["TF_Name", "n_peaks", "mse", "r", "r2", "rmse", "mae",
             #                           "medae", "elapsed_time", "top_motifs", "top_weights",
             #                           "bottom_motifs", "bottom_weights"])
+            # df_columns = ["TF_Name","n_peaks","mse", "r", "r2", "rmse", "mae",
+            #               "medae", "elapsed_time","top_motifs","top_revmotifs","top_weights","bottom_motifs","bottom_weights"]
+            df_columns = ["TF_Name", "n_peaks", "r2","r2_std","elapsed_time"]
             x = pd.DataFrame([result], index=[train_file],
-                             columns=["TF_Name", "n_peaks", "r2","r2_std","elapsed_time"])
+                             columns=df_columns)
             perf_df = pd.concat([perf_df, x])
     print("FINAL:\n")
     print(f"All files is trained!")
@@ -208,12 +249,12 @@ def run_all(n_process):
             for error in error_log:
                 file.write(f"File: {error[0]}, Error: {error[1]}\n")
     b = time.perf_counter()
-    perf_df.to_csv("outputs/encode_all_results_OLS20.csv")
+    perf_df.to_csv("outputs/encode_10_result_10CV_run3.csv")
     time_elapsed = b - a
     return perf_df, time_elapsed
 
 if __name__ == "__main__":
-    result,time_elapsed = run_all(n_process)
+    result,time_elapsed = run_all(14)
     print("\n")
     print("The total trained files:", len(result))
     print(result.head())
@@ -261,36 +302,30 @@ if __name__ == "__main__":
 
 # Upload Sample File
 # Exlusively
-pbm_format = pd.read_csv(f"Homo_sapiens_NA_Unpublished_GATA1.txt", sep="\t", header=None)
-# pbm_format[1] = pbm_format[1].apply(variable_seq)
-df = read_chip(pbm_format, log2trans)  # count table of trainset
-X = df.drop('score',axis=1).apply(minmax,axis=0) # values of features
-y = df["score"] # target values
-print(df)
-#
-len(df)
-len(df.columns)
+# pbm_format = pd.read_csv(f"Homo_sapiens_NA_Unpublished_GATA1.txt", sep="\t", header=None)
+# # pbm_format[1] = pbm_format[1].apply(variable_seq)
+# df = read_chip(pbm_format, log2trans)  # count table of trainset
+# X = df.drop('score',axis=1).apply(minmax,axis=0) # values of features
+# y = df["score"] # target values
 
-bio.itoseq(4099)
-bio.seqtoi("GATAAG")
     # # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1234)
 # #
 # # # Run Model
-sgd = SGDRegressor(loss="squared_error",alpha=0.0001, max_iter=1000, tol=1e-3, penalty=None, eta0=0.1,random_state=10)
-# kf = KFold(n_splits=10,shuffle=True,random_state=25)
-# sgd_scores = cross_val_score(sgd, X, y, cv=kf,verbose=1,n_jobs=-1)
+# sgd = SGDRegressor(loss="squared_error",alpha=0.0001, max_iter=1000, tol=1e-3, penalty=None, eta0=0.1,random_state=25)
+# kf = KFold(n_splits=10,shuffle=True,random_state=12)
+# sgd_scores = cross_val_score(sgd, X, y, cv=kf,scoring="r2",verbose=1,n_jobs=-1)
 # sgd_scores
 # sgd_scores.mean()
 # sgd_scores.std()
 #
 
-sgd.fit(X,y)
-print_motif = pd.DataFrame({"Weights": sgd.coef_}, index=nonrev_list)  # for array-like output of OLS result
-print_motif = print_full(print_motif["Weights"].sort_values(ascending=False))
-cov_matrix = get_cov_params(sgd,X, y)
-seq1 = "GCAATTTCAGTCTACAGCATGTGCATGCTTATCAGTGCATTCTAAATATTTCTATGTGAG".upper()
-seq2 = "GCAATTTCAGTCTACAGCATGTGCATGCTTCTCAGTGCATTCTAAATATTTCTATGTGAG".upper() #  8.279763929029813e-20
-mypredict(seq1, seq2, 6,sgd.coef_,cov_matrix)
+# sgd.fit(X,y)
+# print_motif = pd.DataFrame({"Weights": sgd.coef_}, index=nonrev_list)  # for array-like output of OLS result
+# print_motif = print_full(print_motif["Weights"].sort_values(ascending=False))
+# cov_matrix = get_cov_params(sgd,X, y)
+# seq1 = "GCAATTTCAGTCTACAGCATGTGCATGCTTATCAGTGCATTCTAAATATTTCTATGTGAG".upper()
+# seq2 = "GCAATTTCAGTCTACAGCATGTGCATGCTTCTCAGTGCATTCTAAATATTTCTATGTGAG".upper() #  8.279763929029813e-20
+# mypredict(seq1, seq2, 6,sgd.coef_,cov_matrix)
 
 # # Independent Test dataset
 # pbm_format_test = pd.read_csv("Homo_sapiens_M00558_1.94d_Barrera2016_EGR2_E412K_R1.txt", sep="\t", header=None)
@@ -316,41 +351,4 @@ mypredict(seq1, seq2, 6,sgd.coef_,cov_matrix)
 # scipy.stats.pearsonr(y_test, a)[0]
 #
 
-# Select the highest r2 performance between each others
-perf_df = pd.read_csv("outputs/encode_unique_maxr2_CV.csv",index_col="Unnamed: 0")
-len(perf_df["TF_Name"])
-len(perf_df["TF_Name"].unique())
-TF_names = perf_df["TF_Name"].unique()
 
-targets = []
-for tf in TF_names:
-    ind = perf_df[perf_df["TF_Name"] == tf]["r2"].idxmax()
-    targets.append(ind)
-len(targets) # 254 unique TF datasets
-perf_df.loc[targets].to_csv("outputs/encode_unique_maxr2_CV.csv")
-
-pd.Series(targets).to_csv("outputs/target_filenames.csv")
-
-list1 = targets
-list2 = target_1
-difference_set = set(list2) ^ set(list1)
-common_elements = set(list2) & set(list1)
-len(difference_set)
-len(common_elements)
-targets == target_1
-target_1 = targets
-len(target)
-sum(perf_df["n_peaks"] > 2080)
-sum(perf_df["r2"] >= 0.1)
-sum(perf_df[perf_df["r2"] > 0.1]["n_peaks"]  > 2080)
-
-chip_filtered = perf_df[perf_df["r2"] > 0.1]["TF_Name"].unique()
-
-pbm_tfs = pd.read_csv("outputs/prev/pbm_all_results_maxr2.csv")
-pbm_uniq = pbm_tfs["TF_Name"].unique()
-chip_uniq = perf_df["TF_Name"].unique()
-
-common_elements = set(pbm_uniq) & set(chip_uniq)
-difference_set = set(pbm_uniq) ^ set(chip_uniq)
-len(common_elements)
-len(difference_set)

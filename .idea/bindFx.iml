@@ -4,6 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/hs_pbm_trainset_cisbp" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 (bindFx)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

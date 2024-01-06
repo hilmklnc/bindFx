@@ -36,8 +36,9 @@ def print_full(x): # print binary-based sequences
     y.index = [bio.itoseq(x) for x in y.index]
     y["revcomp"] = [bio.revcompstr(x) for x in y.index]
     return y
-from pyfaidx import Fasta
-
+# from pyfaidx import Fasta
+# convert zip file to bgzip : https://github.com/slowkow/pytabix or using the bgzip tool from samtools (htslib).
+# pyfaids only supports for compressed bgzip file
 # import pyfaidx
 # ref_genome = Fasta(f"genome_assembly/hg38.zip",sequence_always_upper=True) # 1-based coordinates
 # sequence = ref_genome["chrom"][start-1:end].seq
