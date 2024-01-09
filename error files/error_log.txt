@@ -1,0 +1,5 @@
+Errors occurred in the following files:
+File: ChIPseq_ENCFF072JDK_K562_cell line_ZNF507.txt, Error: Singular matrix
+File: ChIPseq_ENCFF193XBL_HEK293_cell line_ZNF426.txt, Error: Singular matrix
+File: ChIPseq_ENCFF651DMY_HEK293_cell line_ZNF34.txt, Error: Singular matrix
+File: ChIPseq_ENCFF770OVD_HEK293_cell line_ZNF555.txt, Error: Singular matrix
