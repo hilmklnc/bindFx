@@ -1,3 +1,4 @@
+import concurrent.futures
 import glob
 import pandas as pd
 import os
@@ -33,22 +34,26 @@ def process_vcf(param, TF_name, vcf_seq,vcf_ID):
     print(f"\nProcess {current_process} finished analyzing VCF file: {vcf_ID}, TF_name: {TF_name}")
     end = time.time()
     print(f"\nTime -----------:{end-start}")
-
-
 nonrev_list = bio.gen_nonreversed_kmer(6)  # 2080 features (6-mer DNA)
 
-# vcf_seqs = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*.csv")[:2]  # I have 21 vcf files to be analyzed
-vcf_seqs = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*csv")[:1]  # I have 21 vcf files to be analyzed
-# Listing pre-computed-pred files
-params = glob.glob("outputs/params/*.pkl")
-param_dict = {}  # store pre-computed parameters
-for param in params:  # I have 50 pre-computed parameters of models
-    with open(param, "rb") as file:
-        param_dict[param] = pickle.load(file)
-# dict(list(param_dict.items())[chunk_size:chunksize])
-if __name__ == "__main__":
+def main(num_proc):
+
+    vcf_seqs = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*csv")[:1]  # I have 21 vcf files to be analyzed (large file)
+
+    # Listing pre-computed-pred files
+    params = glob.glob("outputs/params/*.pkl")
+    param_dict = {}  # store pre-computed parameters
+    for param in params:  # I have 404 pre-computed parameters of models, including SGDRegressor estimated parameters and covariance matrix of features
+        with open(param, "rb") as file:
+            param_dict[param] = pickle.load(file)
+
+    if not os.path.exists("outputs/pred_results"):
+        os.makedirs("outputs/pred_results")
+
     start_time = time.perf_counter()
-    with multiprocessing.Pool(processes=2) as pool:
+    print(start_time)
+    with concurrent.futures.ProcessPoolExecutor(max_workers=num_proc) as executor:
+        futures = []
         for vcf_seq in vcf_seqs:
             vcf_ID = os.path.splitext(os.path.basename(vcf_seq))[0].split("_")[0]
             vcf_data = pd.read_csv(vcf_seq)
@@ -58,31 +63,19 @@ if __name__ == "__main__":
                 print(f"outputs/pred_results/{vcf_ID} folder is created!")
 
             for param_file, param_data in param_dict.items():
-                TF_name = param_file.split("_")[-1].split(".")[0]
-                pool.apply_async(process_vcf, args=(param_data, TF_name, vcf_data, vcf_ID))
-        pool.close()
-        pool.join()
+                TF_name = os.path.splitext(os.path.basename(param_file))[0].split("_")[-1]
+                futures.append(executor.submit(process_vcf, param_data, TF_name, vcf_data, vcf_ID))
+
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                result = future.result()
+            except Exception as e:
+                print(f"Error: {e}")
+
     finish_time = time.perf_counter()
     print("Finished!")
-    print("Elapsed time during the whole program in seconds:", finish_time-start_time)
-# def process_vcf_wrapper(args):
-#     param_data, TF_name, vcf_seq, vcf_ID = args
-#     process_vcf(param_data, TF_name, vcf_seq, vcf_ID)
+    print("Elapsed time during the whole program in seconds:", finish_time - start_time)
 
-# if __name__ == "__main__":
-#     with multiprocessing.Pool() as pool:
-#         jobs = []
-#         for vcf_seq_file in vcf_seqs:
-#             vcf_ID = vcf_seq_file.split("\\")[1].split("_")[0]
-#             vcf_seq = pd.read_csv(vcf_seq_file)
-#
-#             if not os.path.exists(f"outputs/pred_results/{vcf_ID}"):
-#                 os.makedirs(f"outputs/pred_results/{vcf_ID}")
-#                 print(f"outputs/pred_results/{vcf_ID} folder is created!")
-#
-#             for param_file, param_data in param_dict.items():
-#                 TF_name = param_file.split("_")[-1].split(".")[0]
-#                 jobs.append((param_data, TF_name, vcf_seq, vcf_ID))
-#         pool.map(process_vcf_wrapper, jobs)
-#         pool.close()
-#         pool.join()
+
+if __name__ == "__main__":
+    main(12)
