@@ -41,7 +41,7 @@ def main(num_proc):
     vcf_seqs = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*csv")[:1]  # I have 21 vcf files to be analyzed (large file)
 
     # Listing pre-computed-pred files
-    params = glob.glob("outputs/params/*.pkl")
+    params = glob.glob("outputs/params/*.pkl")[:100]
     param_dict = {}  # store pre-computed parameters
     for param in params:  # I have 404 pre-computed parameters of models, including SGDRegressor estimated parameters and covariance matrix of features
         with open(param, "rb") as file:

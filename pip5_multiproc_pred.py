@@ -40,11 +40,15 @@ nonrev_list = bio.gen_nonreversed_kmer(6)  # 2080 features (6-mer DNA)
 # vcf_seqs = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*.csv")[:2]  # I have 21 vcf files to be analyzed
 vcf_seqs = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*csv")[:1]  # I have 21 vcf files to be analyzed
 # Listing pre-computed-pred files
-params = glob.glob("outputs/params/*.pkl")
+params = glob.glob("outputs/params/*.pkl")[:10]
 param_dict = {}  # store pre-computed parameters
 for param in params:  # I have 50 pre-computed parameters of models
     with open(param, "rb") as file:
-        param_dict[param] = pickle.load(file)
+        tuple_param = pickle.load(file)
+        coef = np.array(tuple_param[1], dtype=np.float32)
+        covar = np.array(tuple_param[3], dtype=np.float32)
+        param_dict[param] = [coef,covar]
+
 # dict(list(param_dict.items())[chunk_size:chunksize])
 if __name__ == "__main__":
     start_time = time.perf_counter()
