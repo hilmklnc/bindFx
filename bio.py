@@ -80,6 +80,7 @@ def insert_pos(seqint,base,pos): # pos is position from the right
 # i.e. oligfreq + reverse merge in the original R code
 # Input: panda list and kmer length
 # Output: oligonucleotide count with reverse removed
+
 def nonr_olig_freq(seqtbl,kmer,nonrev_list):
     # separator, since this is binary, the number is counted from the right
     rightseparator = kmer
