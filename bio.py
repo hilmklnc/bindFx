@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Bio file to be used in olskmer training prediction file
+Bio file to be used in bindFx training prediction file
 """
 import pandas as pd
+import numpy as np
 
 # all permutations are already reverse-deleted
 # all sequences are represented in binary
@@ -81,26 +82,97 @@ def insert_pos(seqint,base,pos): # pos is position from the right
 # Input: panda list and kmer length
 # Output: oligonucleotide count with reverse removed
 
-def nonr_olig_freq(seqtbl,kmer,nonrev_list):
-    # separator, since this is binary, the number is counted from the right
+# def nonr_olig_freq(seqtbl,kmer,nonrev_list):
+#     # separator, since this is binary, the number is counted from the right
+#     rightseparator = kmer
+#     leftseparator = rightseparator
+#     olig_df =  {k: [0] * len(seqtbl) for k in nonrev_list} # use dictionary first to avoid slow indexing from panda data frame
+#     for i in range(0,len(seqtbl)): #22s for 3000
+#         mask = (4**kmer)-1
+#         cpy = int(seqtbl[i])
+#         while cpy > (4**kmer)-1:
+#             cur = cpy & mask
+#             right = cur & ((4**rightseparator)-1)
+#             left = (cur >> 2*leftseparator) << 2*rightseparator
+#             seqint = left | right
+#
+#             r = (1<<(2*kmer))|seqint # append 1
+#             rc = revcomp(r)
+#             if r > rc:
+#                 r = rc
+#             # 392secs with loc,434 secs with the regression. R time, 10secs for allocation, 3.97mins for linreg
+#             # with 'at', only 23secs! -- 254secs total for 6mer
+#             olig_df[r][i] += 1
+#             cpy >>= 2
+#     return pd.DataFrame(olig_df)
+
+# arrange the dtypes in the structures according to specific data
+# def nonr_olig_freq2(seqtbl, kmer, nonrev_list):
+#     rightseparator = kmer
+#     leftseparator = rightseparator
+#
+#     # Use numpy for faster array operations
+#     seqint_arr = np.array(seqtbl)
+#     # olig_df = np.zeros((len(nonrev_list), len(seqtbl)))
+#     olig_df = np.zeros((len(seqtbl), len(nonrev_list)))
+#
+#     mask = (4 ** kmer) - 1
+#     for i in range(len(seqtbl)):
+#         cpy = seqint_arr[i]
+#         while cpy > mask:
+#             cur = cpy & mask
+#             right = cur & ((4 ** rightseparator) - 1)
+#             left = (cur >> (2 * leftseparator)) << (2 * rightseparator)
+#             seqint = left | right
+#
+#             r = (1 << (2 * kmer)) | seqint  # append 1
+#             rc = revcomp(r)
+#
+#             r = r if r < rc else rc  # Use conditional operator
+#             # Use numpy indexing for faster updates
+#             # olig_df[nonrev_list.index(r), i] += 1
+#             olig_df[i, nonrev_list.index(r)] += 1
+#             cpy >>= 2
+#
+#     return pd.DataFrame(olig_df, columns=nonrev_list)
+def nonr_olig_freq(seqtbl, kmer=6):
+    nonrev_list = gen_nonreversed_kmer(kmer)
     rightseparator = kmer
     leftseparator = rightseparator
-    olig_df =  {k: [0] * len(seqtbl) for k in nonrev_list} # use dictionary first to avoid slow indexing from panda data frame
-    for i in range(0,len(seqtbl)): #22s for 3000
-        mask = (4**kmer)-1
-        cpy = int(seqtbl[i])
-        while cpy > (4**kmer)-1:
+    # Use numpy for faster array operations
+    seqint_arr = np.array(seqtbl) # adjust dtypes if it is necessary
+    olig_df = np.zeros((len(seqtbl), len(nonrev_list)))
+    mask = (4 ** kmer) - 1
+    for i, cpy in enumerate(seqint_arr):
+        while cpy > mask:
             cur = cpy & mask
-            right = cur & ((4**rightseparator)-1)
-            left = (cur >> 2*leftseparator) << 2*rightseparator
+            right = cur & ((4 ** rightseparator) - 1)
+            left = (cur >> (2 * leftseparator)) << (2 * rightseparator)
             seqint = left | right
 
-            r = (1<<(2*kmer))|seqint # append 1
+            r = (1 << (2 * kmer)) | seqint  # append 1
             rc = revcomp(r)
-            if r > rc:
-                r = rc
-            # 392secs with loc,434 secs with the regression. R time, 10secs for allocation, 3.97mins for linreg
-            # with 'at', only 23secs! -- 254secs total for 6mer
-            olig_df[r][i] += 1
+            r = r if r < rc else rc  # Use conditional operator
+            # Use numpy indexing for faster updates
+            olig_df[i, nonrev_list.index(r)] += 1
             cpy >>= 2
-    return pd.DataFrame(olig_df)
+    return pd.DataFrame(olig_df, columns=nonrev_list)
+
+# a = []
+# for x in range(5):
+#     start = time.perf_counter()
+#     sequences = [seqtoi(x) for x in vcf_data['sequence']]
+#     altered_sequences =[seqtoi(y) for y in vcf_data['altered_seq']]
+#     ref = nonr_olig_freq(sequences, 6, nonrev_list)
+#     mut = nonr_olig_freq(altered_sequences, 6, nonrev_list)
+#     diff_count = (mut - ref).to_numpy()
+#     diff = np.dot(diff_count, param_dict[params[3]][0])
+#     SE = np.sqrt(np.abs((np.dot(diff_count,  param_dict[params[3]][1]) * diff_count).sum(axis=1)))
+#     t = diff / SE
+#     p_val = scipy.stats.norm.sf(np.abs(t)) * 2
+#     end = time.perf_counter()
+#     print(end-start)
+#     a.append(end-start)
+#
+# np.mean(SE)
+# np.mean(a)

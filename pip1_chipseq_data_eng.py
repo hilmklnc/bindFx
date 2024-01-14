@@ -159,11 +159,11 @@ def prep_train_ChIP(bed_path, genome, ENCODE_ID,TF,biosample): # MODEL OUTPUT / 
     return num_peak # 4 variables
 
 
-# TRANSFORM INTO TRAINSET
+# TRANSFORM ChIP-seq bednarrowpeakfiles TO PBM-like TRAINSET
 meta = pd.read_csv("metadata.tsv",sep="\t")
 meta["File accession"].nunique()
 meta = meta[["File accession","Experiment target","File assembly","Biosample type","Biosample term name","Experiment target"]]
-raw_peaks = glob.glob("outputs/ENCODE_2558_beds/*.bed")[100:110]
+raw_peaks = glob.glob("outputs/ENCODE_2558_beds/*.bed")
 
 perf_df = pd.DataFrame(columns=["TF_Name","#peaks","Biosample","Biosample type"])
 for raw in raw_peaks:

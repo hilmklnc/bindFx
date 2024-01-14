@@ -249,4 +249,12 @@ plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 plt.title("ChIP+PBM data Peak Distribution")
 plt.show()
 
-
+# Change/modify the filename in the folder:
+os.makedirs("params2")
+all_files = os.listdir("outputs/params")
+for i,filename in enumerate(all_files):
+    match_path = os.path.join("outputs/params",filename)
+    filename = filename.split(".txt")[0] +  filename.split(".txt")[1]
+    copy_path = os.path.join("params2",filename)
+    shutil.copy(match_path,copy_path)
+    print(f"\n{i+1}:{filename} Copied!")

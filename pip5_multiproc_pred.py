@@ -1,43 +1,42 @@
 import glob
-import pandas as pd
 import os
 import pickle
 import bio
-import scipy.stats
 import numpy as np
+import pandas as pd
+import scipy.stats
 import multiprocessing
 import time
+import warnings
+import logging
+from tqdm import tqdm
 
-def mypredict(seq1, seq2, params,cov_matrix,TF_name):
-    ref = bio.nonr_olig_freq([bio.seqtoi(seq1)],6,nonrev_list)  # from N
-    mut = bio.nonr_olig_freq([bio.seqtoi(seq2)],6,nonrev_list)  # to N
-    diff_count = mut - ref # c': count matrix
-    diff = np.dot(diff_count, params) # c'Bhat --> the difference in binding affinity
-    # print(f"Process {os.getpid()} and {TF_name} diff score aka (wildBeta-mutatedBeta) (c'): ",diff)
-    SE = np.sqrt( abs( (np.dot(diff_count,cov_matrix) * diff_count).sum(axis=1) ) ) # 2080*2080 X 2080*1 = 2080*1 # a scalar value Standart error
-    t =  diff/ SE # t-statistic : c'Bhat / sqrt(c'*covBhat*c)
-    p_val = scipy.stats.norm.sf(abs(t))*2 # follows t-distribution
-    statdict = {"diff":diff[0], "t":t[0], "p_value":p_val[0] }
-    return statdict
-def pred_vcf(param,TF_name,vcf_seq,vcf_ID):
-    stat_df = vcf_seq.apply(lambda x: mypredict(x["sequence"],x["altered_seq"],param[0],param[1],TF_name),
-                                                   axis=1,result_type="expand")
-    pred_df = pd.concat([vcf_seq,stat_df],axis=1)
-    pred_df.to_csv(f"outputs/pred_results/{vcf_ID}/pred_{vcf_ID}_{TF_name}.csv", index=False)
-def process_vcf(param, TF_name, vcf_seq,vcf_ID):
+warnings.filterwarnings("ignore")
+
+def pred_vcf(TF_param, TF_name, vcf_data, vcf_ID):
+    sequences = [bio.seqtoi(x) for x in vcf_data['sequence']]
+    altered_sequences =[bio.seqtoi(y) for y in vcf_data['altered_seq']]
+    ref = bio.nonr_olig_freq(sequences)
+    mut = bio.nonr_olig_freq(altered_sequences)
+    diff_count = (mut - ref).to_numpy()
+    diff = np.dot(diff_count, TF_param[0])
+    SE = np.sqrt(np.abs((np.dot(diff_count,  TF_param[1]) * diff_count).sum(axis=1)))
+    t = diff / SE
+    p_val = scipy.stats.norm.sf(np.abs(t)) * 2
+    pred_vcf = vcf_data.assign(diff=diff, t=t, p_value=p_val)
+    # Save the DataFrame to a CSV file
+    pred_vcf.to_csv(f"outputs/pred_results/{vcf_ID}/pred_{vcf_ID}_{TF_name}.csv", index=False)
+
+def process_vcf(param, TF_name, vcf_data,vcf_ID):
     start = time.time()
     current_process = multiprocessing.current_process().name
-    print(f"Process {current_process} is analyzing VCF file: {vcf_ID}, TF_name: {TF_name}")
-    pred_vcf(param, TF_name, vcf_seq,vcf_ID)
-    print(f"\nProcess {current_process} finished analyzing VCF file: {vcf_ID}, TF_name: {TF_name}")
+    pred_vcf(param, TF_name, vcf_data,vcf_ID)
     end = time.time()
-    print(f"\nTime -----------:{end-start}")
+    return end-start,vcf_ID,TF_name,current_process
 
-nonrev_list = bio.gen_nonreversed_kmer(6)  # 2080 features (6-mer DNA)
 def main(n_proc):
-    # vcf_seqs = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*.csv")[:2]  # I have 21 vcf files to be analyzed
-    vcf_seqs = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*csv")  # I have 21 vcf files to be analyzed
-    # Listing pre-computed-pred files
+    vcf_seq_files = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*csv") # I have 21 vcf files to be analyzed
+    # Listing pre-computed-pred file
     params = glob.glob("outputs/params/*.pkl")
     param_dict = {}  # store pre-computed parameters
     for param in params:  # I have 50 pre-computed parameters of models
@@ -46,28 +45,43 @@ def main(n_proc):
             coef = np.array(tuple_param[1], dtype=np.float32)
             covar = np.array(tuple_param[3], dtype=np.float32)
             param_dict[param] = [coef, covar]
-    # dict(list(param_dict.items())[chunk_size:chunksize])
-    start_time = time.perf_counter()
-    with multiprocessing.Pool(processes=n_proc) as pool:
-        for vcf_seq in vcf_seqs:
-            vcf_ID = os.path.splitext(os.path.basename(vcf_seq))[0].split("_")[0]
-            vcf_data = pd.read_csv(vcf_seq)
-            if not os.path.exists(f"outputs/pred_results/{vcf_ID}"):
-                os.makedirs(f"outputs/pred_results/{vcf_ID}")
-                print(f"outputs/pred_results/{vcf_ID} folder is created!")
 
-            for param_file, param_data in param_dict.items():
-                TF_name = param_file.split("_")[-1].split(".")[0]
-                pool.apply_async(process_vcf, args=(param_data, TF_name, vcf_data, vcf_ID))
-        pool.close()
-        pool.join()
+    start_time = time.time()
+    total_iterations = len(vcf_seq_files) * len(param_dict)
+    with tqdm(total=total_iterations, unit=" TF-model",colour = "#004000") as pbar:
+        def my_callback(result):
+            pbar.update()
+            pbar.set_description(f"W{result[3].split("-")[1]}-Elapsed time for {result[2]} in {result[1]}: {round(result[0],3)}")
 
-    finish_time = time.perf_counter()
+        with multiprocessing.Pool(processes=n_proc) as pool:
 
-    print("\nFinished!\n")
-    print("\nElapsed time during the whole program in seconds:", finish_time - start_time)
+            for vcf_file in vcf_seq_files:
+                vcf_ID = os.path.splitext(os.path.basename(vcf_file))[0].split("_")[0]
+                if not os.path.exists(f"outputs/pred_results/{vcf_ID}"):
+                    os.makedirs(f"outputs/pred_results/{vcf_ID}")
+                    print(f"outputs/pred_results/{vcf_ID} folder is created!")
+                vcf_data = pd.read_csv(vcf_file)
+
+                for param_file, param_data in param_dict.items():
+                    TF_name = param_file.split("_")[-1].split(".")[0]
+                    pool.apply_async(process_vcf, args=(param_data, TF_name,  vcf_data, vcf_ID)
+                                     ,callback=my_callback)
+
+            pool.close()
+            pool.join()
+
+    finish_time = time.time()
+
+    logging.info("Finished!\n")
+    logging.info(f"Elapsed time during the whole program in seconds: {finish_time - start_time}\n")
 
 if __name__ == "__main__":
-    print("Predictions Started!")
-    main(14)
-    print("\n---------------------ended---------------------")
+
+    logging.basicConfig(level=logging.INFO,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+                        format='%(asctime)s [%(levelname)s] - %(message)s')
+
+    logging.info("########### Predictions Started! ###########\n")
+    main(os.cpu_count())
+    logging.info("---------------------Ended---------------------")
+
+

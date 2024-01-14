@@ -64,7 +64,7 @@ def addcolumn_gain_loss(vcf_seq_path,pred_vcfs,alpha):
         pred_sgd = pd.read_csv(pred_vcf)
         pred_sgd.reset_index(inplace=True)
         pred_sgd.apply(gain_or_loss,alpha=alpha,axis=1)
-    vcf_seq.to_csv(f"breastcancer_21VCF/pred_all/{vcf_ID}_loss_gain_data_{alpha}.csv",index=False)
+    vcf_seq.to_csv(f"outputs/pred_all/{vcf_ID}_loss_gain_data_{alpha}.csv",index=False)
 
 nonrev_list = bio.gen_nonreversed_kmer(6) # 2080 features (6-mer DNA)
 #-------------------------------------------------------------------------------------------------------------------
@@ -92,14 +92,14 @@ for vcf_seq in vcf_seqs: # for each vcf seq, I will compute their t and p values
 #-------------------------------------------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------------------------------------------
-vcf_seqs = glob.glob("breastcancer_21VCF/VCF_seq_probs/*.csv") # 21 vcf seq files
-folders = os.listdir('breastcancer_21VCF/pred_21VCF_adjusted')# Specify the directory path you want to list
+vcf_seqs = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*.csv")[:2] # 21 vcf seq files
+folders = os.listdir('outputs/pred_results_part1')[:2]# folders
 
 # Multiple Correction Testing:
 for folder in folders:
     vcf_ID = folder
     os.makedirs(f"outputs/{vcf_ID}")
-    pred_files = glob.glob(f"breastcancer_21VCF/pred_21VCF_raw_pvalues/{vcf_ID}/*.csv")
+    pred_files = glob.glob(f"outputs/pred_results_part1/{vcf_ID}/*.csv")
     for pred_file in pred_files:
         pred_file_ID = pred_file.split("\\")[1]
         pred_data = pd.read_csv(pred_file)
@@ -110,7 +110,7 @@ for folder in folders:
 # for alpha = 0.05 threshold for q values
 for folder,vcf_seq in zip(folders,vcf_seqs):
     vcf_ID = folder
-    pred_files = glob.glob(f"breastcancer_21VCF/pred_21VCF_adjusted/{vcf_ID}/*.csv")
+    pred_files = glob.glob(f"outputs/pred_results_part2/{vcf_ID}/*.csv")
     addcolumn_gain_loss(vcf_seq,pred_files,0.05)
     print(f"{folder} file is generated")
 
