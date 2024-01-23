@@ -1,9 +1,13 @@
 import glob
+
+import numpy as np
+
 # import pyfastx
 import bio
 import pandas as pd
 from pyfaidx import Fasta
 #--------------------------------------------------------------------------#
+
 # vep format
 def altered_seq(df): # fetching -30/+30 sequences from the center mutation point
     center = 30
@@ -100,7 +104,7 @@ def altered_seq(df): # Creating VCF mutation
         else: # unbalanced deletion # (NNNN/N)
             altered_sequence = dna_sequences[:center] + allele_alt + dna_sequences[(center + 1 + len(allele_ref)):]
     return altered_sequence
-
+a = pd.read_csv("BreastCancer560_all.txt", sep="\t",header=None)
 def single_vcf_to_bed(vcf_file): # convert vcf file to bed format containing length of 60 bps
     vcf_data = pd.read_csv(vcf_file, sep="\t",header=None)
     vcf_data[0] = "chr" + vcf_data[0] # adding chr prefix for fetching seqs
@@ -165,9 +169,9 @@ def single_vcf_seq(vcf_file,fasta_file): # adding wild-type and altered 60 bps s
     vcf_data.columns = col
     vcf_ID = vcf_data["Sample Names"][0]
     # ------------- Featurizing SBS probs ----------
-    vcf_data["MutationTypes"] = vcf_data.apply(add_context, axis=1)
-    vcf_data = pd.merge(vcf_data, probs, how="left")
-    vcf_data.to_csv(f"sample_vcf_seq_probs/{vcf_ID}_seq_probs.csv", index=False)
+    # vcf_data["MutationTypes"] = vcf_data.apply(add_context, axis=1)
+    # vcf_data = pd.merge(vcf_data, probs, how="left")
+    vcf_data.to_csv(f"sample_vcf_seq_probs/{vcf_ID}_seq_probs.txt", sep="\t",index=False)
     print(f"{sample_name} is featured with to ref seq and alt seq!")
     return vcf_data
 
@@ -175,7 +179,7 @@ def single_vcf_seq(vcf_file,fasta_file): # adding wild-type and altered 60 bps s
 
 # Run vcf files
 
-probs = pd.read_csv("breast_cancer_samples/COSMIC_SBS96_Decomposed_Mutation_Probabilities.txt",sep="\t")
+# probs = pd.read_csv("breast_cancer_samples/COSMIC_SBS96_Decomposed_Mutation_Probabilities.txt",sep="\t")
 
 # For all vcf files in the global path names
 def glob_vcf_to_bed(vcf_files): # convert vcf file to bed format containing length of 60 bps
@@ -189,7 +193,8 @@ def glob_bed_to_fasta(bed_files,genome):
     ref_genome = Fasta(f"genome_assembly/{genome}.fa", sequence_always_upper=True)  # 1-based coordinates
     beds = glob.glob(bed_files)
     for bed in beds:
-        vcf_name = bed.split("\\")[1].split("_")[0]
+        # vcf_name = bed.split("\\")[1].split("_")[0]
+        vcf_name = "all_vcf"
         with open(bed, "r") as bed_file, open(f"sample_vcf_fasta/{vcf_name}_fasta.txt", "w") as output_file:
             for line in bed_file:
                 chrom, start, end = line.strip().split("\t")[:3]
@@ -208,11 +213,77 @@ def glob_vcf_seq(vcf_files,fasta_files):
         single_vcf_seq(vcf_file,fasta_file)
     return "Operation is done"
 
+os.makedirs("sample_vcf_beds")
+
+os.makedirs("sample_vcf_fasta")
+
+os.makedirs("sample_vcf_seq_probs")
 #1: bed format preparation
 glob_vcf_to_bed("breast_cancer_samples/sample_vcfs/*.vcf")
+glob_vcf_to_bed("BreastCancer560_all.txt")
 
 #2: fasta: fetching sequence
 glob_bed_to_fasta("sample_vcf_beds/*.txt","hg19")
 
+glob_bed_to_fasta("sample_vcf_beds/PD10010a_bed.txt","hg19")
+
 #3: vcf sequence and probs
 glob_vcf_seq("breast_cancer_samples/sample_vcfs/*.vcf","sample_vcf_fasta/*.txt")
+glob_vcf_seq("BreastCancer560_all.txt","sample_vcf_fasta/all_vcf_fasta.txt")
+
+
+all_files = pd.read_csv("sample_vcf_seq_probs/all_seq_probs.csv")
+
+# NEW COLUMNS
+all_files["iref"] = [bio.seqtoi(x) for x in all_files['ref']]
+all_files["ialt"] = [bio.seqtoi(x) for x in all_files['alt']]
+all_files["isequence"] = [bio.seqtoi(x) for x in all_files['sequence']]
+all_files["ialtered_seq"] = [bio.seqtoi(x) for x in all_files['altered_seq']]
+
+all_files["Sample Names"] = all_files["Sample Names"].astype("category")
+all_files["chr"] = all_files["chr"].astype("category")
+
+# DOWNCASTING
+all_files["start"] = pd.to_numeric(all_files["start"],downcast= "unsigned")
+all_files["iref"] = pd.to_numeric(all_files["iref"],downcast= "unsigned")
+all_files["ialt"] = pd.to_numeric(all_files["ialt"],downcast= "unsigned")
+all_files["isequence"] = pd.to_numeric(all_files["isequence"],downcast= "unsigned")
+all_files["ialtered_seq"] = pd.to_numeric(all_files["ialtered_seq"],downcast= "unsigned")
+
+all_files_shrunk = all_files[["chr","start","Sample","isequence","ialtered_seq"]]
+all_files_shrunk.info(memory_usage="deeper")
+dtype_dict = all_files_shrunk.dtypes.to_dict()
+
+all_files_shrunk.to_parquet("all_files_int.pqt",index=False)
+all_files_shrunk.to_parquet("testall.gzip",compression="gzip")
+
+s = time.time()
+c = pd.read_csv("sample_vcf_seq_probs/all_files_integer_pred.csv",dtype=dtype_dict)
+f = time.time()
+
+all_files_shrunk.to_pickle("sample_vcf_seq_probs/test.pkl")
+df_pqt=pd.read_parquet('outputs/pred_results_ch2_new/chunk#0/pred_chunk#0_AR.pqt')
+df_pqt2=pd.read_parquet("outputs/pred_results_ch3_old/chunk#0/pred_chunk#0_AR.pqt")
+df_pqt.describe()
+df_pqt.to_parquet("all_files_int.pqt",index=False)
+df_pqt.info(memory_usage="deeper")
+df_pqt2[df_pqt2["p_value"] != df_pqt2["p_value"]]
+df_pqt[df_pqt2["p_value"] != df_pqt2["p_value"]]
+
+groups  = df_pqt.groupby('Sample')
+i = 1
+sample_dict = {}
+max(sample_dict, key=sample_dict.get)
+samples_info = pd.DataFrame([sample_dict]).T
+samples_info.sort_values(by=0,ascending=False).to_csv("sample_size.csv")
+for name, group in groups:
+    # print(f"Sample: {name}\n{group}\n")
+    print(i)
+    sample_dict[name] = len(group)
+    i += 1
+
+chunk_size = 20000
+for j,i in enumerate(range(0, 3479652, chunk_size)):
+    vcf_data_chunk = pd.read_parquet("sample_vcf_seq_probs/all_files_int.pqt")[i:i + chunk_size]
+    vcf_ID = "chunk#" + str(j)
+    print(vcf_ID)
