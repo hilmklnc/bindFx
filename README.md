@@ -1,6 +1,14 @@
 # bindFx
- * TF-binding Effect Prediction (bindFx)
+* TF-binding Effect Prediction (bindFx)
 
+### Install Requirements
+Using Conda:<br>
+`conda create --name <env_name> --file requirements.txt`<br>
+
+Using pip:<br>
+`pip install -r requirements.txt`
+
+## Abstract
 Somatic mutations can play functional roles within the genome, thereby contributing to the development of complex human diseases like cancer. Most of these somatic mutations predominantly fall into non-coding regions which make up around 98% of the human genome, where they can have a functional influence by disrupting the accord of regulatory interactions between transcription factors (TFs) and DNA. 
 
 In this study, we propose a novel in-silico approach to assess the repercussion of non-coding mutations on TF-DNA interplay. Our methodology hinges on k-mer-based models of TF-binding specificity, trained on high-throughput in vivo ChIP-seq data.  To estimate the optimal parameters of the k-mer regression binding model for each human TF, we employ the stochastic gradient descent (SGD) algorithm. There are various existing DNA-binding models like the conventional ordinary least squares (OLS) method or recently developed other models that can be used to assess TF-binding specificity. 
