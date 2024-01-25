@@ -152,4 +152,4 @@ cython_debug/
 #.idea/
 outputs/
 genome_assembly/hg*
-data/
+data/massy
