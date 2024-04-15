@@ -1,0 +1,404 @@
+TF name,#Gain,#Loss,Percent_gain,Percent_loss,FC,log2FC,abs(log2FC),DBD_family,p_value_fisher,q_value_fisher,TF_binding
+ZHX2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ZNF507,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+OVOL1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+EP300,0,0,,,1,0,0,Unknown,1.0,1.0,Neutral
+ZNF629,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+NR2C2,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+AHDC1,0,0,,,1,0,0,AT hook,1.0,1.0,Neutral
+ZFP3,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF865,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+NFYC,0,0,,,1,0,0,CBF/NF-Y,1.0,1.0,Neutral
+MXI1,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+USF2,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+NFIB,0,0,,,1,0,0,SMAD,1.0,1.0,Neutral
+HMGA2,0,0,,,1,0,0,AT hook,1.0,1.0,Neutral
+SRF,0,0,,,1,0,0,MADS box,1.0,1.0,Neutral
+E2F1,0,0,,,1,0,0,E2F,1.0,1.0,Neutral
+CTCF,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+IRF4,0,0,,,1,0,0,IRF,1.0,1.0,Neutral
+ZMYM3,0,0,,,1,0,0,MYM-type ZF,1.0,1.0,Neutral
+IRF1,0,0,,,1,0,0,IRF,1.0,1.0,Neutral
+TEAD1,0,0,,,1,0,0,TEA,1.0,1.0,Neutral
+FOXA2,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+HMG20A,0,0,,,1,0,0,HMG/Sox,1.0,1.0,Neutral
+RFX3,0,0,,,1,0,0,RFX,1.0,1.0,Neutral
+RFX1,0,0,,,1,0,0,RFX,1.0,1.0,Neutral
+NFYA,0,0,,,1,0,0,CBF/NF-Y,1.0,1.0,Neutral
+ZNF610,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZBTB26,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF134,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+NFIC,0,0,,,1,0,0,SMAD,1.0,1.0,Neutral
+ZNF652,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF76,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF512,0,0,,,1,0,0,C2H2 ZF; BED ZF,1.0,1.0,Neutral
+JUN,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ZNF426,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF654,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZBTB2,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF8,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZFP91,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+GABPB1,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+KLF9,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF549,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+TRIM22,0,0,,,1,0,0,Unknown,1.0,1.0,Neutral
+YY1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+MAZ,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+FOSL1,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+NFYB,0,0,,,1,0,0,CBF/NF-Y,1.0,1.0,Neutral
+MNT,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+ARID4A,0,0,,,1,0,0,ARID/BRIGHT,1.0,1.0,Neutral
+HLF,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ZNF324,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF623,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF624,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+MAFF,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ZNF148,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZFY,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+HMGXB4,0,0,,,1,0,0,HMG/Sox,1.0,1.0,Neutral
+TEAD3,0,0,,,1,0,0,TEA,1.0,1.0,Neutral
+CREB1,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+CREM,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ZNF513,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+TFDP2,0,0,,,1,0,0,E2F,1.0,1.0,Neutral
+MYC,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+RUNX3,0,0,,,1,0,0,Runt,1.0,1.0,Neutral
+DMBX1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+TFDP1,0,0,,,1,0,0,E2F,1.0,1.0,Neutral
+GMEB2,0,0,,,1,0,0,SAND,1.0,1.0,Neutral
+FOSL2,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+PBX3,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ZNF12,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+GATA2,0,0,,,1,0,0,GATA,1.0,1.0,Neutral
+ONECUT2,0,0,,,1,0,0,CUT; Homeodomain,1.0,1.0,Neutral
+ZBTB14,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF398,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+JUND,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+MAFK,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ZNF316,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF431,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF596,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+CEBPG,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ZBTB33,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+NR2C1,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+ZBTB8A,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+SP2,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF24,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+NFIL3,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ARID4B,0,0,,,1,0,0,ARID/BRIGHT,1.0,1.0,Neutral
+ZNF770,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ATF4,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+MGA,0,0,,,1,0,0,T-box,1.0,1.0,Neutral
+REST,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF558,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF449,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF574,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF394,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF239,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF687,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+TFE3,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+BHLHE40,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+ZNF143,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+PAX3,0,0,,,1,0,0,Homeodomain; Paired box,1.0,1.0,Neutral
+NFE2,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ZNF10,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZBTB40,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF34,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF317,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+SP3,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+NFE2L2,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ZNF639,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+AFF1,0,0,,,1,0,0,Unknown,1.0,1.0,Neutral
+BACH1,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ATF1,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+TFAP4,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+PBX2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+FOXS1,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+ZNF518A,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+NFIX,0,0,,,1,0,0,SMAD,1.0,1.0,Neutral
+TCF7L2,0,0,,,1,0,0,HMG/Sox,1.0,1.0,Neutral
+FOXA1,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+ZNF329,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF189,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+HOXA3,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+PRDM1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+RFX5,0,0,,,1,0,0,RFX,1.0,1.0,Neutral
+ZNF555,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+TEAD4,0,0,,,1,0,0,TEA,1.0,1.0,Neutral
+NR2F2,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+ZSCAN4,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+UBTF,0,0,,,1,0,0,HMG/Sox,1.0,1.0,Neutral
+DRAP1,0,0,,,1,0,0,Unknown,1.0,1.0,Neutral
+ZNF585B,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+PAXIP1,0,0,,,1,0,0,Homeodomain; Paired box,1.0,1.0,Neutral
+ZBTB12,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+E2F6,0,0,,,1,0,0,E2F,1.0,1.0,Neutral
+ZBTB21,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+BMI1,0,0,,,1,0,0,Unknown,1.0,1.0,Neutral
+SP1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+SIX5,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+CBFB,0,0,,,1,0,0,CBF/NF-Y,1.0,1.0,Neutral
+ARID1B,0,0,,,1,0,0,ARID/BRIGHT,1.0,1.0,Neutral
+THAP11,0,0,,,1,0,0,THAP finger,1.0,1.0,Neutral
+SCRT2,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ONECUT1,0,0,,,1,0,0,CUT; Homeodomain,1.0,1.0,Neutral
+ZNF777,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+E2F8,0,0,,,1,0,0,E2F,1.0,1.0,Neutral
+ZNF263,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+CEBPD,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ZNF680,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+SP4,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+PKNOX1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ZNF707,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+SMAD5,0,0,,,1,0,0,SMAD,1.0,1.0,Neutral
+FOS,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+KLF11,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ELF1,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ZBTB11,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+PBX1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ATF2,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+TFAP2D,0,0,,,1,0,0,AP-2,1.0,1.0,Neutral
+ARID3C,0,0,,,1,0,0,ARID/BRIGHT,1.0,1.0,Neutral
+ARID5A,0,0,,,1,0,0,ARID/BRIGHT,1.0,1.0,Neutral
+PLAGL1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF691,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZNF146,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZBTB3,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+SOX1,0,0,,,1,0,0,HMG/Sox,1.0,1.0,Neutral
+TBPL2,0,0,,,1,0,0,TBP,1.0,1.0,Neutral
+ZNF200,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+SNAI2,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+KLF1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+BCL6,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+EGR2,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+OVOL2,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+GFI1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+GFI1B,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+HNF4G,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+WT1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+VSX1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ZNF655,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+CRX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+PBX4,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+PHOX2B,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+VAX2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+VSX2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+MSX2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ESX1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+HOXD13,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+NKX2-8,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+HESX1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+PITX2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+PROP1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ISX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+NKX2-5,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+SIX6,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+HOXC4,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+HOXB7,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+PAX6,0,0,,,1,0,0,Homeodomain; Paired box,1.0,1.0,Neutral
+PAX7,0,0,,,1,0,0,Homeodomain; Paired box,1.0,1.0,Neutral
+PAX4,0,0,,,1,0,0,Homeodomain; Paired box,1.0,1.0,Neutral
+ARX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+GABPA,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+POU4F3,0,0,,,1,0,0,Homeodomain; POU,1.0,1.0,Neutral
+ZFHX3,0,0,,,1,0,0,C2H2 ZF; Homeodomain,1.0,1.0,Neutral
+HLX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+NR1H4,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+NR2E3,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+POU2F1,0,0,,,1,0,0,Homeodomain; POU,1.0,1.0,Neutral
+NKX2-4,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+HOXC6,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+IRX4,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+OTP,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+HOXC5,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+NKX1-1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+DBX1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+NKX2-6,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+LCOR,0,0,,,1,0,0,Pipsqueak,1.0,1.0,Neutral
+DBX2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+NKX1-2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ST18,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+RBPJ,0,0,,,1,0,0,CSL,1.0,1.0,Neutral
+ZBTB1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+FOXP4,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+MYPOP,0,0,,,1,0,0,Myb/SANT,1.0,1.0,Neutral
+NR4A3,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+TBX10,0,0,,,1,0,0,T-box,1.0,1.0,Neutral
+MTF2,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+PHF1,0,0,,,1,0,0,CxxC,1.0,1.0,Neutral
+BCL11A,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+NFATC4,0,0,,,1,0,0,Rel,1.0,1.0,Neutral
+BCL11B,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+FOXN2,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+FOXR1,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+FOXN4,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+SOX4,0,0,,,1,0,0,HMG/Sox,1.0,1.0,Neutral
+SOHLH2,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+POGK,0,0,,,1,0,0,Brinker,1.0,1.0,Neutral
+ZSCAN29,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+PLAGL2,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+VEZF1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZBTB44,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+CENPBD1,0,0,,,1,0,0,CENPB,1.0,1.0,Neutral
+TIGD1,0,0,,,1,0,0,CENPB,1.0,1.0,Neutral
+TIGD6,0,0,,,1,0,0,CENPB,1.0,1.0,Neutral
+TIGD2,0,0,,,1,0,0,CENPB,1.0,1.0,Neutral
+CXXC4,0,0,,,1,0,0,CxxC,1.0,1.0,Neutral
+HDX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+DUXA,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+MSANTD3,0,0,,,1,0,0,MADF,1.0,1.0,Neutral
+NAIF1,0,0,,,1,0,0,MADF,1.0,1.0,Neutral
+ZZZ3,0,0,,,1,0,0,Myb/SANT,1.0,1.0,Neutral
+LCORL,0,0,,,1,0,0,Pipsqueak,1.0,1.0,Neutral
+ETV3L,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+CUX2,0,0,,,1,0,0,CUT; Homeodomain,1.0,1.0,Neutral
+CUX1,0,0,,,1,0,0,CUT; Homeodomain,1.0,1.0,Neutral
+E2F2,0,0,,,1,0,0,E2F,1.0,1.0,Neutral
+LHX9,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+POU5F1B,0,0,,,1,0,0,Homeodomain; POU,1.0,1.0,Neutral
+NFATC2,0,0,,,1,0,0,Rel,1.0,1.0,Neutral
+ARID3B,0,0,,,1,0,0,ARID/BRIGHT,1.0,1.0,Neutral
+TWIST2,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+HEYL,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+HES4,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+MLXIP,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+CREB3L2,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+RARG,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+CREBZF,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+KDM2B,0,0,,,1,0,0,CxxC,1.0,1.0,Neutral
+KMT2A,0,0,,,1,0,0,CxxC; AT hook,1.0,1.0,Neutral
+DNMT1,0,0,,,1,0,0,CxxC,1.0,1.0,Neutral
+TET1,0,0,,,1,0,0,CxxC,1.0,1.0,Neutral
+KDM2A,0,0,,,1,0,0,CxxC,1.0,1.0,Neutral
+FBXL19,0,0,,,1,0,0,CxxC,1.0,1.0,Neutral
+DMRT3,0,0,,,1,0,0,DM,1.0,1.0,Neutral
+DMRT1,0,0,,,1,0,0,DM,1.0,1.0,Neutral
+DMRTA2,0,0,,,1,0,0,DM,1.0,1.0,Neutral
+DMRT2,0,0,,,1,0,0,DM,1.0,1.0,Neutral
+DLX3,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+FOXP1,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+GCM1,0,0,,,1,0,0,GCM,1.0,1.0,Neutral
+FOXK1,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+HOXA2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+NOBOX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+LHX2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+LHX6,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+TLX2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+EMX1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ZFHX2,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+LBX1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+VENTX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+HOXB13,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ZHX1,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+POU6F1,0,0,,,1,0,0,Homeodomain; POU,1.0,1.0,Neutral
+SHOX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+ANHX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+SEBOX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+HHEX,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+TERF2,0,0,,,1,0,0,Myb/SANT,1.0,1.0,Neutral
+MYRF,0,0,,,1,0,0,Ndt80/PhoG,1.0,1.0,Neutral
+NR2E1,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+NR3C2,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+FOXB2,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+NR2F6,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+POU6F2,0,0,,,1,0,0,Homeodomain; POU,1.0,1.0,Neutral
+POU3F4,0,0,,,1,0,0,Homeodomain; POU,1.0,1.0,Neutral
+MYC-MAX,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+RFX2,0,0,,,1,0,0,RFX,1.0,1.0,Neutral
+RFX8,0,0,,,1,0,0,RFX,1.0,1.0,Neutral
+GMEB1,0,0,,,1,0,0,SAND,1.0,1.0,Neutral
+HMG20B,0,0,,,1,0,0,HMG/Sox,1.0,1.0,Neutral
+LIN54,0,0,,,1,0,0,TCR/CxC,1.0,1.0,Neutral
+E2F3,0,0,,,1,0,0,E2F,1.0,1.0,Neutral
+E2F4,0,0,,,1,0,0,E2F,1.0,1.0,Neutral
+ETS1,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+MAX,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+MXD1-MAX,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+RUNX1,0,0,,,1,0,0,Runt,1.0,1.0,Neutral
+FOXA3,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+RUNX2,0,0,,,1,0,0,Runt,1.0,1.0,Neutral
+EGR1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+FOXO3,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+GATA1,0,0,,,1,0,0,GATA,1.0,1.0,Neutral
+MITF,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+TBP,0,0,,,1,0,0,TBP,1.0,1.0,Neutral
+TCF3,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+TFAP2A,0,0,,,1,0,0,AP-2,1.0,1.0,Neutral
+GCN4,0,0,,,1,0,0,Unknown,1.0,1.0,Neutral
+ELF2,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+EHF,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ELF3,0,0,,,1,0,0,Ets; AT hook,1.0,1.0,Neutral
+SOX2,0,0,,,1,0,0,HMG/Sox,1.0,1.0,Neutral
+ELF4,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ELF5,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ELK1,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ELK3,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ELK4,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ERG,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ETV1,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ETV3,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ETV4,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ETV5,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+ETV6,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+FLI1,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+SPDEF,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+SPI1,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+SPIC,0,0,,,1,0,0,Ets,1.0,1.0,Neutral
+POU5F1,0,0,,,1,0,0,Homeodomain; POU,1.0,1.0,Neutral
+USF1,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+ESR1,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+FOXN1,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+GATA4,0,0,,,1,0,0,GATA,1.0,1.0,Neutral
+HNF4A,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+NRF1,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+SOX3,0,0,,,1,0,0,HMG/Sox,1.0,1.0,Neutral
+NR5A1,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+PPARG,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+MAFG,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+AR,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+ATF3,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+CEBPA,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+CEBPB,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+CRAMP1L,0,0,,,1,0,0,Myb/SANT,1.0,1.0,Neutral
+DBP,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+DNAJC21,0,0,,,1,0,0,Myb/SANT,1.0,1.0,Neutral
+DNMT3A,0,0,,,1,0,0,GATA,1.0,1.0,Neutral
+E4F1,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+NFATC3,0,0,,,1,0,0,Rel,1.0,1.0,Neutral
+ESRRB,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+FOXB1,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+FOXC1,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+FOXC2,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+FOXG1,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+FOXJ2,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+FOXM1,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
+HMGB3,0,0,,,1,0,0,HMG/Sox,1.0,1.0,Neutral
+IRF2,0,0,,,1,0,0,IRF,1.0,1.0,Neutral
+KLF12,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+LOC100168299,0,0,,,1,0,0,Unknown,1.0,1.0,Neutral
+AHCTF1,0,0,,,1,0,0,AT hook,1.0,1.0,Neutral
+MLX,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+NR2F1,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+MSX3,0,0,,,1,0,0,Homeodomain,1.0,1.0,Neutral
+PGR,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+POU3F2,0,0,,,1,0,0,Homeodomain; POU,1.0,1.0,Neutral
+POU4F1,0,0,,,1,0,0,Homeodomain; POU,1.0,1.0,Neutral
+ARID5B,0,0,,,1,0,0,ARID/BRIGHT,1.0,1.0,Neutral
+RETN,0,0,,,1,0,0,Unknown,1.0,1.0,Neutral
+RARB,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+RXRB,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+RXRG,0,0,,,1,0,0,Nuclear receptor,1.0,1.0,Neutral
+SETBP1,0,0,,,1,0,0,AT hook,1.0,1.0,Neutral
+SREBF1,0,0,,,1,0,0,bHLH,1.0,1.0,Neutral
+TBR1,0,0,,,1,0,0,T-box,1.0,1.0,Neutral
+TBX2,0,0,,,1,0,0,T-box,1.0,1.0,Neutral
+TBX20,0,0,,,1,0,0,T-box,1.0,1.0,Neutral
+TBX4,0,0,,,1,0,0,T-box,1.0,1.0,Neutral
+TBX5,0,0,,,1,0,0,T-box,1.0,1.0,Neutral
+TCFEC,0,0,,,1,0,0,Unknown,1.0,1.0,Neutral
+TEF,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+XBP1,0,0,,,1,0,0,bZIP,1.0,1.0,Neutral
+ZFP959,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+ZSCAN10,0,0,,,1,0,0,C2H2 ZF,1.0,1.0,Neutral
+MYBL2,0,0,,,1,0,0,Myb/SANT,1.0,1.0,Neutral
+FOXN3,0,0,,,1,0,0,Forkhead,1.0,1.0,Neutral
