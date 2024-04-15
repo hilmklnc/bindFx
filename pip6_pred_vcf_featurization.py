@@ -2,161 +2,151 @@ import glob
 import pandas as pd
 import os
 import pickle
-import bio
+import biocoder
 import scipy.stats
 import numpy as np
 import statsmodels.stats.multitest as mlt
+import warnings
+warnings.filterwarnings("ignore")
 
-def mypredict(seq1, seq2, params,cov_matrix):
-    ref = bio.nonr_olig_freq([bio.seqtoi(seq1)],6,nonrev_list)  # from N
-    mut = bio.nonr_olig_freq([bio.seqtoi(seq2)],6,nonrev_list)  # to N
-    diff_count = mut - ref # c': count matrix
-    diff = np.dot(diff_count, params) # c'Bhat --> the difference in binding affinity
-    # print("\ndiff score aka (wildBeta-mutatedBeta) (c'): ",diff)
-    SE = np.sqrt((np.dot(diff_count,cov_matrix) * diff_count).sum(axis=1)) # 2080*2080 X 2080*1 = 2080*1 # a scalar value Standart error
-    t =  diff/ SE # t-statistic : c'Bhat / sqrt(c'*covBhat*c)
-    p_val = scipy.stats.norm.sf(abs(t))*2 # follows t-distribution
-    statdict = {"diff":diff[0], "t":t[0], "p_value":p_val[0] }
-    return statdict
 
-def pred_vcf(param,ENCODE_ID,TF_name,vcf_seq):
-    stat_df = vcf_seq.apply(lambda x: mypredict(x["sequence"],x["altered_seq"],param[1],param[-1]),
-                                                   axis=1,result_type="expand")
-    pred_df = pd.concat([vcf_seq,stat_df],axis=1)
-    pred_df.to_csv(f"{vcf_ID}/pred_{vcf_ID}_{ENCODE_ID}_{TF_name}.csv", index=False)
 
-# def pred_mutation(sgd_chip_none,vcf_file, ENCODE_ID): # prediction of VEP file
-#     pred_vcf = pred_vcf(sgd_chip_none,vcf_file,ENCODE_ID)
-#     return pred_vcf
-def mean_update(current_mean, current_count, new_value):
-    if new_value < 0:
-        updated_sum = (-current_mean) * current_count + new_value
+# Merge all chunks into single TF prediction file
+def merge_chunks(files_path=f"truba_results/pred_results/chunk#{i}/*.pqt",num_chunk=177):
+    pred_TF_files = {}
+    num_chunks = num_chunk
+    for i in range(num_chunks): # store each chunks for corresponding TF
+        pred_results = glob.glob(files_path)
+        for j in pred_results:
+            TF_name = j.split("_")[-1].split(".")[0]
+            if TF_name not in pred_TF_files.keys():
+                pred_TF_files[TF_name] = [j]
+            else:
+                pred_TF_files[TF_name].append(j)
+    for k,v in pred_TF_files.items():
+        df_list = [pd.read_parquet(file_path) for file_path in v]
+        combined_df = pd.concat(df_list,ignore_index=True)
+        combined_df.to_parquet(f"outputs/all_preds/pred_BreastCancer560_{k}.pqt", index=False)
+        print("TF:",k,"Saved!")
+
+# check for any errors
+ls = glob.glob("truba_results/preds_BreastCancer560/*.pqt")
+
+total_rows = 3479651
+for x in ls:
+    df = pd.read_parquet(ls)
+    a = len(df)
+    if a != total_rows:
+        print("-----------------SMTHNG GOING WRONG----------------!!!!!")
+        print(ls)
+    elif a == total_rows:
+        print(a)
     else:
-        updated_sum = current_mean * current_count + new_value
-    updated_count = current_count + 1
-    updated_mean = updated_sum / updated_count
-    return abs(updated_mean)
-def gain_or_loss(row,alpha):
-    q_values = row['adj_pvalue']
-    p_values = row["p_value"]
-    diff = row['diff']
-    ind = row["index"]
-    if q_values <= alpha:
-        if diff < 0: # if diff score is negative, then loss of TF exist
-            vcf_seq["TF_loss"][ind] += 1
-            vcf_seq["TF_loss_diff"][ind]=mean_update(vcf_seq["TF_loss_diff"][ind],len(vcf_seq["TF_loss_detail"][ind]), diff)
-            vcf_seq["TF_loss_detail"][ind].append([TF_name, diff, p_values,q_values])
-        elif diff > 0: # if diff score is positive, then gain of TF exist
-            vcf_seq["TF_gain"][ind] += 1
-            vcf_seq["TF_gain_diff"][ind]=mean_update(vcf_seq["TF_gain_diff"][ind],len(vcf_seq["TF_gain_detail"][ind]), diff)
-            vcf_seq["TF_gain_detail"][ind].append([TF_name, diff, p_values,q_values])
-def addcolumn_gain_loss(vcf_seq_path,pred_vcfs,alpha):
-    global vcf_seq, TF_name
-    vcf_seq = pd.read_csv(vcf_seq_path)
-    vcf_seq["TF_loss"] = 0 # add columns
-    vcf_seq["TF_gain"] = 0
-    vcf_seq["TF_loss_diff"] = 0
-    vcf_seq["TF_gain_diff"] = 0
-    vcf_seq["TF_loss_detail"] = [ [] for _ in range(len(vcf_seq))]
-    vcf_seq["TF_gain_detail"] = [ [] for _ in range(len(vcf_seq))]
-    for pred_vcf in pred_vcfs:
-        TF_name = pred_vcf.split("_")[-1].split(".")[0]
-        pred_sgd = pd.read_csv(pred_vcf)
-        pred_sgd.reset_index(inplace=True)
-        pred_sgd.apply(gain_or_loss,alpha=alpha,axis=1)
-    vcf_seq.to_csv(f"outputs/pred_all/{vcf_ID}_loss_gain_data_{alpha}.csv",index=False)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
-nonrev_list = bio.gen_nonreversed_kmer(6) # 2080 features (6-mer DNA)
-#-------------------------------------------------------------------------------------------------------------------
-# Creating pre-computed-pred VCF files
-params = glob.glob("outputs/params/*.pkl")
-vcf_seqs = glob.glob("breastcancer_21VCF/VCF_seq_files/*.csv") # I have 21 vcf files to be analyzed
-param_dict = {} # store pre-computed parameters
-for param in params: # I have 50 pre-computed parameters of models
-    with open(param,"rb") as file:
-        param_dict[param] = pickle.load(file)
+#########################################################################################
 
-for vcf_seq in vcf_seqs: # for each vcf seq, I will compute their t and p values for each TF models
-    vcf_ID = vcf_seq.split("\\")[1].split("_")[0]
-    vcf_seq = pd.read_csv(vcf_seq)
-    if not os.path.exists(f"{vcf_ID}"):
-        os.makedirs(f"{vcf_ID}")
-    else:
-        continue
-    print(f"{vcf_ID} folder is created!")
-    for id,param in param_dict.items():
-        ENCODE_ID = id.split("_")[1]
-        TF_name = id.split("_")[2].split(".")[0]
-        pred_vcf(param, ENCODE_ID,TF_name,vcf_seq) # predictions of TF models
-    print(f"{vcf_ID} is predicted by SGD TF-models!")
-#-------------------------------------------------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------------------------------------------------
-vcf_seqs = glob.glob("breast_cancer_samples/sample_vcf_seq_probs/*.csv")[:2] # 21 vcf seq files
-folders = os.listdir('outputs/pred_results_part1')[:2]# folders
-
-# Multiple Correction Testing:
-for folder in folders:
-    vcf_ID = folder
-    os.makedirs(f"outputs/{vcf_ID}")
-    pred_files = glob.glob(f"outputs/pred_results_part1/{vcf_ID}/*.csv")
-    for pred_file in pred_files:
+# MULTIPLE CORRECTION TESTING
+pred_files = glob.glob("truba_results/preds_BreastCancer560/*.pqt") # 21 vcf seq files
+# os.makedirs(f"truba_results/preds_BreastCancer560_qval")
+def FDR_control(pred_files):
+    for i,pred_file in enumerate(pred_files):
         pred_file_ID = pred_file.split("\\")[1]
-        pred_data = pd.read_csv(pred_file)
+        pred_data = pd.read_parquet(pred_file)
         pred_data["adj_pvalue"] = mlt.multipletests(pred_data["p_value"], method='bonferroni')[1]
-        pred_data.to_csv(f"outputs/{vcf_ID}/{pred_file_ID}",index=False)
-#-------------------------------------------------------------------------------------------------------------------
-# FEATURIZING THE VCF FILE :
-# for alpha = 0.05 threshold for q values
-for folder,vcf_seq in zip(folders,vcf_seqs):
-    vcf_ID = folder
-    pred_files = glob.glob(f"outputs/pred_results_part2/{vcf_ID}/*.csv")
-    addcolumn_gain_loss(vcf_seq,pred_files,0.05)
-    print(f"{folder} file is generated")
+        pred_data.to_parquet(f"truba_results/preds_BreastCancer560_qval/mlt_{pred_file_ID}",index=False)
+        print(i,": Multiple Correction testing is done for", pred_file_ID)
 
-# different p values
-for x in [0.05,0.01,0.001,0.0001,0.00001]:
-    folder = f"pred_21vcf_{x}"
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-        print(f"pred_21vcf_{x} folder is created!")
-    for folder, vcf_seq in zip(folders, vcf_seqs):
-        vcf_ID = folder
-        pred_files = glob.glob(f"breastcancer_21VCF/pred_21VCF/{vcf_ID}/*.csv")
-        addcolumn_gain_loss(vcf_seq, pred_files, x)
-        print(f"{folder} file is generated!")
-    print(f"predictions having {x} alpha value are completed!")
+#########################################################################################
+#ADDING GAIN/LOSS INFO for all predictions
 
+def mean_update(current_mean, current_count, new_value):
+    old_sum = current_mean * current_count
+    return abs((old_sum + abs(new_value)) / (current_count + 1))
+def gain_or_loss_vectorized(df, pred_vcf, alpha):
+    loss_indices = df.index[(pred_vcf["adj_pvalue"] <= alpha) & (pred_vcf["diff"] < 0)]
+    gain_indices = df.index[(pred_vcf["adj_pvalue"] <= alpha) & (pred_vcf["diff"] > 0)]
+    # Update loss and gain counts
+    df.loc[loss_indices, 'TF_loss'] += 1
+    df.loc[gain_indices, 'TF_gain'] += 1
+
+    # Update loss and gain diffs
+    df.loc[loss_indices, 'TF_loss_diff_mean'] = mean_update(df.loc[loss_indices, 'TF_loss_diff_mean'],
+                                                            df.loc[loss_indices, 'TF_loss_detail'].apply(len),
+                                                            pred_vcf.loc[loss_indices, 'diff'])
+    df.loc[gain_indices, 'TF_gain_diff_mean'] = mean_update(df.loc[gain_indices, 'TF_gain_diff_mean'],
+                                                            df.loc[gain_indices, 'TF_gain_detail'].apply(len),
+                                                            pred_vcf.loc[gain_indices, 'diff'])
+
+    # Update loss and gain details
+    loss_info = pred_vcf.loc[loss_indices, ['TF_name', 'diff', 'adj_pvalue']].values.tolist()
+    gain_info = pred_vcf.loc[gain_indices, ['TF_name', 'diff', 'adj_pvalue']].values.tolist()
+
+    for i, loss in zip(loss_indices, loss_info):
+        df['TF_loss_detail'].iloc[i].append(loss)
+    for j, gain in zip(gain_indices, gain_info):
+        df['TF_gain_detail'].iloc[j].append(gain)
+    return df
+
+def columnize_preds(alpha=0.01):
+    pred_files = glob.glob(f"truba_results/preds_BreastCancer560_qval/*.pqt")
+    vcf_seq = pd.read_parquet("main_vcf_seq.pqt")
+    vcf_seq["TF_loss"] = 0  # add columns
+    vcf_seq["TF_gain"] = 0
+    vcf_seq["TF_loss_diff_mean"] = 0
+    vcf_seq["TF_gain_diff_mean"] = 0
+    vcf_seq["TF_loss_detail"] = [[] for _ in range(len(vcf_seq))]
+    vcf_seq["TF_gain_detail"] = [[] for _ in range(len(vcf_seq))]
+
+    for step, pred_path in enumerate(pred_files):
+        TF_name = pred_path.split("_")[-1].split(".")[0]
+        pred_df = pd.read_parquet(pred_path)
+        pred_df["TF_name"] = TF_name
+        # Apply vectorized function
+        vcf_seq = gain_or_loss_vectorized(vcf_seq, pred_df, alpha)
+        print(step, "---- Columnized: ", TF_name)
+
+    vcf_seq.to_parquet(f"outputs/BreastCancer560_loss_gain_results_{alpha}.pqt", index=False)
+
+    return vcf_seq
+
+result = columnize_preds(alpha=0.01)
+
+# result["TF_loss"].sort_values(ascending=False)
+# result["TF_gain"].sort_values(ascending=False)
+# result["TF_gain_diff_mean"].sort_values(ascending=False)
+#
+# mn = []
+# for x in result["TF_gain_detail"].iloc[1749898]:
+#     mn.append(x[1])
+# np.mean(mn)
+# result["TF_gain_diff_mean"].iloc[1749898]
+# result["TF_gain"].iloc[1749898]
+
+df_results = pd.read_parquet("outputs/BreastCancer560_loss_gain_results_0.01.pqt")
+df_results.info()
+df_results.head()
+print(df_results.sort_values(by="TF_loss",ascending=False).iloc[:15,7:11])
+print(df_results.sort_values(by="TF_gain",ascending=False).iloc[:15,7:11])
 
 #----------------------------------------------------------------------------------------------
 
 # Check different significance levels for VEP file
-
-vep_loss_gain_data = glob.glob("vep_loss_gain_data_*.csv")
-mydict = {"TF_Totalcounts":[], "TF_NumofLoss":[], "TF_NumofGain":[], "TF_Loss_AvgWeight":[], "TF_Gain_AvgWeight":[]}
-for vep in vep_loss_gain_data:
-    df = pd.read_csv(vep)
-    mydict["TF_Totalcounts"].extend([df["TF_loss"].sum()+df["TF_gain"].sum()])
-    mydict["TF_NumofLoss"].extend([df[df["driver"] == 1]["TF_loss"].mean() /df[df["driver"] == 0]["TF_loss"].mean()])
-    mydict["TF_NumofGain"].extend([df[df["driver"] == 1]["TF_gain"].mean() / df[df["driver"] == 0]["TF_gain"].mean()])
-    mydict["TF_Loss_AvgWeight"].extend([df[df["driver"] == 1]["TF_loss_diff"].mean() / df[df["driver"] == 0]["TF_loss_diff"].mean()])
-    mydict["TF_Gain_AvgWeight"].extend([df[df["driver"] == 1]["TF_gain_diff"].mean() / df[df["driver"] == 0]["TF_gain_diff"].mean()])
-
-mean_df = pd.DataFrame(mydict,index=vep_loss_gain_data)
-
-mean_df.sort_values(by=["TF_NumofLoss","TF_NumofGain"],ascending=False,inplace=True)
-mean_df.to_csv("driver_vs_nondriver.csv")
-
-#------------------------------------------------------------------------------------
-
-# aggregate all pred files
-pred_qval = glob.glob("breastcancer_21VCF/pred_all_qval_0.05/*.csv")
-aggregate = pd.DataFrame()
-for file in pred_qval:
-    df = pd.read_csv(file)
-    aggregate = pd.concat([aggregate,df])
-aggregate.reset_index(drop="index",inplace=True)
-aggregate.to_csv("aggregate_preds.csv",index=False)
-
+# vep_loss_gain_data = glob.glob("vep_loss_gain_data_*.csv")
+# mydict = {"TF_Totalcounts":[], "TF_NumofLoss":[], "TF_NumofGain":[], "TF_Loss_AvgWeight":[], "TF_Gain_AvgWeight":[]}
+# for vep in vep_loss_gain_data:
+#     df = pd.read_csv(vep)
+#     mydict["TF_Totalcounts"].extend([df["TF_loss"].sum()+df["TF_gain"].sum()])
+#     mydict["TF_NumofLoss"].extend([df[df["driver"] == 1]["TF_loss"].mean() /df[df["driver"] == 0]["TF_loss"].mean()])
+#     mydict["TF_NumofGain"].extend([df[df["driver"] == 1]["TF_gain"].mean() / df[df["driver"] == 0]["TF_gain"].mean()])
+#     mydict["TF_Loss_AvgWeight"].extend([df[df["driver"] == 1]["TF_loss_diff"].mean() / df[df["driver"] == 0]["TF_loss_diff"].mean()])
+#     mydict["TF_Gain_AvgWeight"].extend([df[df["driver"] == 1]["TF_gain_diff"].mean() / df[df["driver"] == 0]["TF_gain_diff"].mean()])
+#
+# mean_df = pd.DataFrame(mydict,index=vep_loss_gain_data)
+#
+# mean_df.sort_values(by=["TF_NumofLoss","TF_NumofGain"],ascending=False,inplace=True)
+# mean_df.to_csv("driver_vs_nondriver.csv")
 
 #------------------------------------------------------------------------------------
+
+

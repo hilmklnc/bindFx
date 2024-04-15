@@ -8,11 +8,9 @@ import scipy.stats
 import multiprocessing
 import time
 import warnings
-import logging
-from tqdm import tqdm
+import pyarrow.parquet as pq
 
 warnings.filterwarnings("ignore")
-
 def pred_vcf(TF_param, TF_name, vcf_data, vcf_ID):
     sequences = vcf_data['isequence'].to_list()
     altered_sequences = vcf_data['ialtered_seq'].to_list()
@@ -39,50 +37,45 @@ def main(n_proc):
     start_time = time.time()
     vcf_filename = "data/breastcancer560/all_files_int.pqt"
     chunk_size = 20000
-    params = glob.glob("data/params403/*.pkl")
+    chunk_params = 10
+    n_chunks = (3479651 // chunk_size)
+    total_iterations =  n_chunks * 403
 
-    param_dict = {}  # store pre-computed parameters
-    for param in params:  # I have 50 pre-computed parameters of models
-        with open(param, "rb") as file:
-            tuple_param = pickle.load(file)
-            param_dict[param] = [tuple_param[0], tuple_param[1]]
-    n_chunks =  (3479651 // chunk_size)
-    total_iterations =  n_chunks * len(param_dict)
-
-    with tqdm(total=total_iterations) as pbar:
+    for i in range(0,403,chunk_params):
+        params = glob.glob("data/params403/*.pkl")[i: i + chunk_params]
+        param_dict = {}  # store pre-computed parameters
+        for param in params:  # I have 50 pre-computed parameters of models
+            with open(param, "rb") as file:
+                tuple_param = pickle.load(file)
+                param_dict[param] = [tuple_param[0], tuple_param[1]]
         def my_callback(result):
-            pbar.update()
-            pbar.set_description(f"\nW{result[3].split("-")[1]}-Elapsed time for {result[2]} in {result[1]}: {round(result[0],3)}\n")
+            print(f"\n[Worker {result[3].split("-")[1]}]-Elapsed time for {result[2]} in {result[1]}:------------{round(result[0],3)} sec")
 
         with multiprocessing.Pool(processes=n_proc) as pool:
 
-            for j, i in enumerate(range(0, 3479651, chunk_size)):
-                vcf_data_chunk = pd.read_parquet(vcf_filename)[i:i + chunk_size]
-                vcf_ID = "chunk#" + str(j)
-                if not os.path.exists(f"outputs/pred_results/{vcf_ID}"):
-                    os.makedirs(f"outputs/pred_results/{vcf_ID}")
-                    print(f"outputs/pred_results/{vcf_ID} folder is created!")
+            with pq.ParquetFile(vcf_filename) as parquet_file:
 
-                for param_file, param_data in param_dict.items():
-                    TF_name = param_file.split("_")[-1].split(".")[0]
-                    pool.apply_async(process_vcf, args=(param_data, TF_name,  vcf_data_chunk, vcf_ID)
-                                     ,callback=my_callback)
+                for j,chunk in enumerate(parquet_file.iter_batches(batch_size=chunk_size)):
+                    vcf_data_chunk = chunk.to_pandas()
+                    vcf_ID = "chunk#" + str(j)
+                    if (not os.path.exists(f"outputs/pred_results/{vcf_ID}")) and (i == 0):
+                        os.makedirs(f"outputs/pred_results/{vcf_ID}")
+                        print(f"outputs/pred_results/{vcf_ID} folder is created!")
 
+                    for param_file, param_data in param_dict.items():
+                        TF_name = param_file.split("_")[-1].split(".")[0]
+                        pool.apply_async(process_vcf, args=(param_data, TF_name,  vcf_data_chunk, vcf_ID)
+                                         ,callback=my_callback)
             pool.close()
             pool.join()
 
     finish_time = time.time()
 
-    logging.info("Finished!\n")
-    logging.info(f"Elapsed time during the whole program in seconds: {finish_time - start_time}\n")
+    print("\nFinished!")
+    print(f"\nElapsed time during the whole program in seconds: {(finish_time - start_time)/3600} h\n")
 
 if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.INFO,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-                        format='%(asctime)s [%(levelname)s] - %(message)s')
-
-    logging.info("########### Predictions Started! ###########\n")
+    print("########### Predictions Started! ###########\n")
     main(7)
-    logging.info("---------------------Ended---------------------")
-
-
+    print("---------------------Ended---------------------")

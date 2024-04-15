@@ -1,9 +1,7 @@
 import glob
-
 import numpy as np
-
 # import pyfastx
-import bio
+import biocoder
 import pandas as pd
 from pyfaidx import Fasta
 #--------------------------------------------------------------------------#
@@ -104,7 +102,6 @@ def altered_seq(df): # Creating VCF mutation
         else: # unbalanced deletion # (NNNN/N)
             altered_sequence = dna_sequences[:center] + allele_alt + dna_sequences[(center + 1 + len(allele_ref)):]
     return altered_sequence
-a = pd.read_csv("BreastCancer560_all.txt", sep="\t",header=None)
 def single_vcf_to_bed(vcf_file): # convert vcf file to bed format containing length of 60 bps
     vcf_data = pd.read_csv(vcf_file, sep="\t",header=None)
     vcf_data[0] = "chr" + vcf_data[0] # adding chr prefix for fetching seqs
@@ -124,25 +121,21 @@ def mutation_context(context,alt_point):
     three_prime = context[2]
     return five_prime + "[" +  ref_seq + ">" + alt_seq + "]" + three_prime
 def add_context(row):
-    ref_point = row["sequence"][5]
-    alt_point = row["altered_seq"][5]
-    if  ref_point == "G" or ref_point == "A":
-        contxt = bio.revcompstr(row["sequence"][4:7])
-        alt_point = bio.revcompstr(alt_point)
+    ref_point = row["ref"]
+    alt_point = row["alt"]
+    if  (ref_point == "G") or (ref_point == "A"):
+        contxt = biocoder.revcompstr(row["sequence"][4:7])
+        alt_point = biocoder.revcompstr(alt_point)
     else:
         contxt = row["sequence"][4:7]
     mutated_context = mutation_context(contxt,alt_point)
     return mutated_context
-
-# for vcf_seq in vcf_seqs:
-#     vcf = pd.read_csv(vcf_seq)
-#     col = ["chr", "start", "Sample Names", "ref", "alt", "sequence", "altered_seq"]
-#     vcf.columns = col
-#     vcf_ID = vcf["Sample Names"][0]
-#     vcf["MutationTypes"] = vcf.apply(add_context, axis=1)
-#     vcf = pd.merge(vcf, probs, how="left")
-#     vcf.to_csv(f"outputs/{vcf_ID}_seq_probs.csv", index=False)
-
+    # ------------- Featurizing SBS probs ----------
+def sbs_columns(vcf_data,probs):
+    vcf_data["MutationTypes"] = vcf_data.apply(add_context, axis=1)
+    vcf_data = pd.merge(vcf_data, probs, how="left",on=["Sample Names","MutationTypes"])
+    vcf_data.to_parquet(f"outputs/BreastCancer560_seq_probs.pqt",index=False)
+    return vcf_data
 def single_bed_to_fasta(bed_file,genome,id):
     # ref_genome = pyfastx.Fasta(f"genome_assembly/{genome}.fa.gz")
     ref_genome = Fasta(f"genome_assembly/{genome}.fa", sequence_always_upper=True)  # 1-based coordinates
@@ -168,17 +161,12 @@ def single_vcf_seq(vcf_file,fasta_file): # adding wild-type and altered 60 bps s
     col = ["chr", "start", "Sample Names", "ref", "alt", "sequence", "altered_seq"]
     vcf_data.columns = col
     vcf_ID = vcf_data["Sample Names"][0]
-    # ------------- Featurizing SBS probs ----------
-    # vcf_data["MutationTypes"] = vcf_data.apply(add_context, axis=1)
-    # vcf_data = pd.merge(vcf_data, probs, how="left")
+    # vcf_data = sbs_columns(vcf_data, probs)
     vcf_data.to_csv(f"sample_vcf_seq_probs/{vcf_ID}_seq_probs.txt", sep="\t",index=False)
     print(f"{sample_name} is featured with to ref seq and alt seq!")
     return vcf_data
 
-
-
 # Run vcf files
-
 # probs = pd.read_csv("breast_cancer_samples/COSMIC_SBS96_Decomposed_Mutation_Probabilities.txt",sep="\t")
 
 # For all vcf files in the global path names
@@ -230,7 +218,19 @@ glob_bed_to_fasta("sample_vcf_beds/PD10010a_bed.txt","hg19")
 #3: vcf sequence and probs
 glob_vcf_seq("breast_cancer_samples/sample_vcfs/*.vcf","sample_vcf_fasta/*.txt")
 glob_vcf_seq("BreastCancer560_all.txt","sample_vcf_fasta/all_vcf_fasta.txt")
+#------------------------------------------
 
+
+BreastCancer560_prob = pd.read_csv("data/breastcancer560/breastcancer560_prob.txt",sep="\t")
+vcf_file = pd.read_parquet("outputs/BreastCancer560_loss_gain_results_0.01.pqt")
+vcf_results_sbs = sbs_columns(vcf_file,BreastCancer560_prob)
+
+read_sbs = pd.read_parquet("outputs/BreastCancer560_results_0.01_probs.pqt")
+read_sbs.iloc[:3,5:8]
+read_sbs.iloc[:100].to_csv("outputs/sample_100FIRST_probs.csv",index=False)
+read_sbs.sample(100).to_csv("outputs/sample_100_probs.csv",index=False)
+
+################### FOR MEMORY AND DISK-SPACE REDUCTION
 
 all_files = pd.read_csv("sample_vcf_seq_probs/all_seq_probs.csv")
 
@@ -276,6 +276,7 @@ sample_dict = {}
 max(sample_dict, key=sample_dict.get)
 samples_info = pd.DataFrame([sample_dict]).T
 samples_info.sort_values(by=0,ascending=False).to_csv("sample_size.csv")
+
 for name, group in groups:
     # print(f"Sample: {name}\n{group}\n")
     print(i)
@@ -287,3 +288,5 @@ for j,i in enumerate(range(0, 3479652, chunk_size)):
     vcf_data_chunk = pd.read_parquet("sample_vcf_seq_probs/all_files_int.pqt")[i:i + chunk_size]
     vcf_ID = "chunk#" + str(j)
     print(vcf_ID)
+
+

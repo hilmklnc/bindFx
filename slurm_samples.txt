@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#SBATCH -p debug                                
+#SBATCH -A hukilinc                        
+#SBATCH -J firstry_truba
+#SBATCH -N 1                                                                
+#SBATCH -n 2                                   
+#SBATCH --time=01:00                         
+#SBATCH --workdir=/truba_scratch/kullanici_adi/test    
+#SBATCH --mail-type=ALL                         
+#SBATCH --mail-user=e223927@metu.edu.tr  
+#SBATCH --error=slurm-%j.out
+#SBATCH --error=slurm-%j.err
+
+
+export DOWNLOAD_DIR=/truba/repo/alphafold-20220608/
+export TMP_DIR=/tmp/alphafold_palamut_6CPU_4GPU
+mkdir -p  $TMP_DIR
+echo "NUMBER OF CORES $SLURM_NTASKS"
+
+wdir=/truba_scratch/hukilinc/deneme   #Uygulama için çalıştırılacak dosyaların adresleri.
+cd $wdir
+
+infile=$wdir/in.si #Uygulamanın çalışması için gerekli input ve output dosyaların adları.
+outfile=$wdir/out.si
+
+
+# module purge
+# eval "$(/truba/sw/centos7.3/lib/anaconda3/2020.07/bin/conda shell.bash hook)"
+
+
+python3 deneme_truba.py
+
+
+scontrol show job $SLURM_JOB_ID > ${SLURM_JOB_ID}.info
+exit
